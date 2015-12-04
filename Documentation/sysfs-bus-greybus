@@ -49,6 +49,25 @@ Contact:	Greg Kroah-Hartman <greg@kroah.com>
 Description:
 		Vendor ID string of a Greybus interface block.
 
+What:		/sys/bus/greybus/device/N-I/module_size
+Date:		October 2015
+KernelVersion:	4.XX
+Contact:	Greg Kroah-Hartman <greg@kroah.com>
+Description:
+		The size of the module that this interface resides in.
+		See the Greybus specification for a description of the
+		different values possible for this file.
+
+What:		/sys/bus/greybus/device/N-I/unlock
+Date:		October 2015
+KernelVersion:	4.XX
+Contact:	Greg Kroah-Hartman <greg@kroah.com>
+Description:
+		Write a 1 to this sysfs file to have the interface
+		unlock the module latch.  If this file is not present,
+		the interface does not control the module latch, use a
+		different interface for the module instead.
+
 What:		/sys/bus/greybus/device/N-I.B
 Date:		October 2015
 KernelVersion:	4.XX

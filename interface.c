@@ -21,6 +21,7 @@ static ssize_t field##_show(struct device *dev,				\
 static DEVICE_ATTR_RO(field)
 
 gb_interface_attr(interface_id, u);
+gb_interface_attr(module_size, x);
 gb_interface_attr(vendor_id, x);
 gb_interface_attr(product_id, x);
 gb_interface_attr(vendor_string, s);
@@ -28,14 +29,59 @@ gb_interface_attr(product_string, s);
 
 static struct attribute *interface_attrs[] = {
 	&dev_attr_interface_id.attr,
+	&dev_attr_module_size.attr,
 	&dev_attr_vendor_id.attr,
 	&dev_attr_product_id.attr,
 	&dev_attr_vendor_string.attr,
 	&dev_attr_product_string.attr,
 	NULL,
 };
-ATTRIBUTE_GROUPS(interface);
 
+static const struct attribute_group interface_group = {
+	.attrs = interface_attrs,
+};
+
+static ssize_t unlock_store(struct device *dev, struct device_attribute *attr,
+			    const char *buf, size_t len)
+{
+	int retval;
+	bool unlock;
+
+	retval = strtobool(buf, &unlock);
+	if (retval)
+		return retval;
+	if (unlock) {
+		// FIXME unlock something!
+	}
+
+	return len;
+}
+static DEVICE_ATTR_WO(unlock);
+
+static umode_t unlock_visible(struct kobject *kobj, struct attribute *a, int n)
+{
+	struct device *dev = container_of(kobj, struct device, kobj);
+	struct gb_interface *intf = to_gb_interface(dev);
+
+	if (intf->feature_lock)
+		return a->mode;
+	return 0;
+}
+
+static struct attribute *unlock_attrs[] = {
+	&dev_attr_unlock.attr,
+	NULL,
+};
+static const struct attribute_group unlock_attribute_group = {
+	.attrs = unlock_attrs,
+	.is_visible = unlock_visible,
+};
+
+static const struct attribute_group *interface_groups[] = {
+	&interface_group,
+	&unlock_attribute_group,
+	NULL,
+};
 
 /* XXX This could be per-host device */
 static DEFINE_SPINLOCK(gb_interfaces_lock);
