@@ -22,6 +22,9 @@ struct gb_interface {
 	u8 device_id;		/* Device id allocated for the interface block by the SVC */
 
 	/* Information taken from the manifest descriptor */
+	enum greybus_module_size module_size;
+	bool feature_lock;
+	bool feature_time_sync;
 	char *vendor_string;
 	char *product_string;
 

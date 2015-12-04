@@ -364,6 +364,7 @@ static bool gb_manifest_parse_interface(struct gb_interface *intf,
 					struct manifest_desc *interface_desc)
 {
 	struct greybus_descriptor_interface *desc_intf = interface_desc->data;
+	u16 features;
 
 	/* Handle the strings first--they can fail */
 	intf->vendor_string = gb_string_get(intf, desc_intf->vendor_stringid);
@@ -373,6 +374,31 @@ static bool gb_manifest_parse_interface(struct gb_interface *intf,
 	intf->product_string = gb_string_get(intf, desc_intf->product_stringid);
 	if (IS_ERR(intf->product_string))
 		goto out_free_vendor_string;
+
+	/*
+	 * Copy out the feature bit fields and warn if there are any left over
+	 * we do not understand.
+	 */
+	features = le16_to_cpu(desc_intf->features);
+
+	if (features & GREYBUS_INTERFACE_FEATURE_LOCK) {
+		intf->feature_lock = true;
+		features &= ~GREYBUS_INTERFACE_FEATURE_LOCK;
+	} else {
+		intf->feature_lock = false;
+	}
+	if (features & GREYBUS_INTERFACE_FEATURE_TIME_SYNC) {
+		intf->feature_time_sync = true;
+		features &= ~GREYBUS_INTERFACE_FEATURE_TIME_SYNC;
+	} else {
+		intf->feature_time_sync = false;
+	}
+
+	if (features)
+		dev_err(&intf->dev, "unknown features set: 0x%x\n", features);
+
+	/* Take the module_size and just export it to userspace */
+	intf->module_size = desc_intf->module_size;
 
 	/* Release the interface descriptor, now that we're done with it */
 	release_manifest_descriptor(interface_desc);

@@ -94,10 +94,22 @@ struct greybus_descriptor_string {
  * *not* the functions within it.
  */
 struct greybus_descriptor_interface {
+	__le16	features;
+	__u8	module_size;
 	__u8	vendor_stringid;
 	__u8	product_stringid;
-	__u8	pad[2];
+	__u8	pad[3];
 } __packed;
+
+enum greybus_module_size {
+	GREYBUS_MODULE_1x2	= 0x00,
+	GREYBUS_MODULE_2x2	= 0x01,
+	GREYBUS_MODULE_2x3	= 0x02,
+	GREYBUS_MODULE_2x4	= 0x03,
+};
+
+#define GREYBUS_INTERFACE_FEATURE_LOCK		BIT(1)
+#define GREYBUS_INTERFACE_FEATURE_TIME_SYNC	BIT(2)
 
 /*
  * An bundle descriptor defines an identification number and a class for
